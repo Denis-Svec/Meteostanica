@@ -22,7 +22,6 @@
 #include "main.h"
 #include "i2c.h"
 #include "gpio.h"
-#include "usart.h"
 #include "lis3mdltr.h"
 #include "lsm6ds0.h"
 #include "stdio.h"
@@ -58,12 +57,14 @@
 
 /* USER CODE BEGIN PV */
 
+char formated_text[50];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
 
+/* USER CODE BEGIN PFP */
+void DrawSun(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -105,16 +106,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
   MX_I2C1_Init();
-  //MX_DMA_Init();
- // MX_USART2_UART_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   lsm6ds0_init();
-    hts221_init();
-    lps22hb_init();
-    lis3mdl_init();
+  hts221_init();
+  lps22hb_init();
+  lis3mdl_init();
 
 
   initCD_Pin();
@@ -126,9 +125,7 @@ int main(void)
    lcdInitialise(LCD_ORIENTATION3);
    lcdClearDisplay(decodeRgbValue(0, 0, 0));
 
-   lcdPutS("VRS 2019", lcdTextX(2), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-   lcdPutS("Cvicenie 8", lcdTextX(2), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-   lcdPutS("SPI komunikacia", lcdTextX(2), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 
    uint8_t state = 0;
 
@@ -138,11 +135,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  memset(formated_text, '\0', sizeof(formated_text));
+	  sprintf(formated_text, "Temp [C]: %0.1f", hts221_get_temp());
 
-	  state ? lcdFilledRectangle(10, 75, 34, 99, decodeRgbValue(31, 0, 0)) : lcdFilledRectangle(10, 75, 34, 99, decodeRgbValue(0, 31, 0));
-	  		state ^= 1;
+	  LL_mDelay(200);
 
-	  		LL_mDelay(100);
+	  lcdPutS(formated_text, lcdTextX(2), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+	  if(state==0){
+		  DrawSun();
+		  state=1;
+	  }
+
+
+	  LL_mDelay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -187,7 +193,17 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void DrawSun(void){
 
+	for(int i=12; i>0;i--){
+		lcdCircle(64, 85, i, decodeRgbValue(255, 255, 51));
+	}
+
+	lcdLine(64, 65, 64, 105, decodeRgbValue(255, 255, 51));
+	lcdLine(42, 85, 85, 85, decodeRgbValue(255, 255, 51));
+	lcdLine(50, 70, 79, 99, decodeRgbValue(255, 255, 51));
+	lcdLine(49, 100, 80, 70, decodeRgbValue(255, 255, 51));
+}
 /* USER CODE END 4 */
 
 /**

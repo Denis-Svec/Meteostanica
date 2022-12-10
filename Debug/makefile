@@ -61,8 +61,8 @@ all: main-build
 main-build: SPI_display.elf secondary-outputs
 
 # Tool invocations
-SPI_display.elf SPI_display.map: $(OBJS) $(USER_OBJS) D:\FEI\ Ing\VRS\Semestralka\Meteostanica\vrs_cvicenie_8\STM32F303K8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "SPI_display.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\FEI Ing\VRS\Semestralka\Meteostanica\vrs_cvicenie_8\STM32F303K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SPI_display.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SPI_display.elf SPI_display.map: $(OBJS) $(USER_OBJS) D:\FEI\ Ing\VRS\Semestralka\Meteostanica\vrs_cvicenie_8_v5\STM32F303K8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "SPI_display.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\FEI Ing\VRS\Semestralka\Meteostanica\vrs_cvicenie_8_v5\STM32F303K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SPI_display.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

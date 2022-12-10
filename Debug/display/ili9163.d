@@ -18,8 +18,7 @@ display/ili9163.o: ../display/ili9163.c ../display/ili9163.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_pwr.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_dma.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_spi.h \
- ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_gpio.h \
- ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_usart.h
+ ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_gpio.h
 ../display/ili9163.h:
 ../display/Minimum_font.h:
 ../Inc/spi.h:
@@ -43,4 +42,3 @@ display/ili9163.o: ../display/ili9163.c ../display/ili9163.h \
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_dma.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_spi.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_gpio.h:
-../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_usart.h:

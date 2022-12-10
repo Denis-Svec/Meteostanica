@@ -37,8 +37,6 @@
 void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_SPI1_Init(void);
-
 unsigned char readWriteSPI1(unsigned char txData);
 void initCS_Pin(void);
 void cs_set(void);
