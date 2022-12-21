@@ -1,6 +1,6 @@
-../Src/hts221.c:8:9:hts221_read_byte	32	static
-../Src/hts221.c:15:6:hts221_write_byte	16	static
-../Src/hts221.c:21:6:hts221_readArray	24	static
-../Src/hts221.c:26:5:hts221_get_humid	24	static
-../Src/hts221.c:51:7:hts221_get_temp	40	static
-../Src/hts221.c:75:9:hts221_init	16	static
+hts221.c:8:9:hts221_read_byte	32	static
+hts221.c:15:6:hts221_write_byte	16	static
+hts221.c:21:6:hts221_readArray	24	static
+hts221.c:26:5:hts221_get_humid	24	static
+hts221.c:51:7:hts221_get_temp	40	static
+hts221.c:75:9:hts221_init	16	static

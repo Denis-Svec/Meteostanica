@@ -32,6 +32,7 @@
 #include <math.h>
 #include "ili9163.h"
 #include "spi.h"
+#include "predictw.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -57,7 +58,12 @@
 
 /* USER CODE BEGIN PV */
 
-char formated_text[50];
+char formated_temp[50];
+char formated_pressure[50];
+char formated_forecast[50];
+int last_forecast = 0;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,7 +100,7 @@ int main(void)
   /* System interrupt init*/
 
   /* USER CODE BEGIN Init */
-
+uint8_t state;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -127,28 +133,97 @@ int main(void)
 
 
 
-   uint8_t state = 0;
+
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
-  {
-	  memset(formated_text, '\0', sizeof(formated_text));
-	  sprintf(formated_text, "Temp [C]: %0.1f", hts221_get_temp());
+  {	  // setup & info
+
+	  state = weather();
+
+	  memset(formated_temp, '\0', sizeof(formated_temp));
+	  memset(formated_pressure, '\0', sizeof(formated_pressure));
+	  memset(formated_forecast, '\0', sizeof(formated_forecast));
+	  sprintf(formated_temp, "Temp [C]: %0.1f", hts221_get_temp());
+	  sprintf(formated_pressure, "Press [Pa]: %0.1f", lps22hb_get_pressure());
 
 	  LL_mDelay(200);
 
-	  lcdPutS(formated_text, lcdTextX(2), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  lcdPutS(formated_temp, lcdTextX(2), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  lcdPutS(formated_pressure, lcdTextX(2), lcdTextY(3)+10, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
-	  if(state==0){
-		  DrawSun();
-		  state=1;
+
+
+	  // forecast
+	  if((state==1) && (last_forecast != 1))
+	  {
+		  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		  LL_mDelay(1000);
+		  DrawSunny();
+		  sprintf(formated_forecast, "SUNNY");
+		  lcdPutS(formated_forecast, lcdTextX(2)+40, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  last_forecast = 1;
 	  }
 
+	  if((state==2)&& (last_forecast != 2))
+	  	  {
+		  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		  LL_mDelay(1000);
+		  DrawCloudySunny();
+		  sprintf(formated_forecast, "PARTIALLY CLOUDY");
+		  lcdPutS(formated_forecast, lcdTextX(2)+8, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  last_forecast = 2;
+	  	  }
 
-	  LL_mDelay(100);
+	  if((state==3)&& (last_forecast != 3))
+	  	  {
+	  		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+	  		LL_mDelay(1000);
+	  		DrawCloudy();
+	  		sprintf(formated_forecast, "CLOUDY");
+	  		lcdPutS(formated_forecast, lcdTextX(2)+36, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  	  	last_forecast = 3;
+	  	  	  }
+
+	  if((state==4)&& (last_forecast != 4))
+	  	  {
+	  		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+	  		LL_mDelay(1000);
+		  	DrawWorsening();
+		  	sprintf(formated_forecast, "Worsening");
+		  	lcdPutS(formated_forecast, lcdTextX(2)+28, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  	last_forecast = 4;
+	  	  	  	  }
+
+	  if((state==5)&& (last_forecast != 5) && (hts221_get_temp() >= 0) )
+	 // if((state==5)&& (last_forecast != 5)&& (temp2 >= 0))
+	  	  {
+	  		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+	  		LL_mDelay(1000);
+	  	  	DrawRaining();
+	  	  	sprintf(formated_forecast, "Raining");
+	  	  	lcdPutS(formated_forecast, lcdTextX(2)+35, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  	  	last_forecast = 5;
+	  	  	 }
+
+	  if((state==5)&& (last_forecast != 5)&& (hts221_get_temp() < 0))
+	//  if((state==5)&& (last_forecast != 5)&& (temp2 < 0))
+	  	  	  {
+	  	  		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+	  	  		LL_mDelay(1000);
+	  	  	  	DrawSnow();
+	  	  	  	sprintf(formated_forecast, "Snowing");
+	  	  	  	lcdPutS(formated_forecast, lcdTextX(2)+35, lcdTextY(3)+25, decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  	  	  	last_forecast = 5;
+	  	  	  	 }
+
+
+
+
+	  LL_mDelay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -193,7 +268,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void DrawSun(void){
+void DrawSunny(void){
 
 	for(int i=12; i>0;i--){
 		lcdCircle(64, 85, i, decodeRgbValue(255, 255, 51));
@@ -204,6 +279,115 @@ void DrawSun(void){
 	lcdLine(50, 70, 79, 99, decodeRgbValue(255, 255, 51));
 	lcdLine(49, 100, 80, 70, decodeRgbValue(255, 255, 51));
 }
+
+void DrawCloudySunny(void){
+	//sun
+	for(int i=12; i>0;i--){
+			lcdCircle(64, 85, i, decodeRgbValue(255, 255, 51));
+		}
+
+	for(int i=10; i>0;i--){
+					lcdCircle(54, 100, i, decodeRgbValue(255, 255, 51));
+					lcdCircle(74, 100, i, decodeRgbValue(255, 255, 51));
+	}
+
+	for(int i=8; i>0;i--){
+
+				lcdCircle(64, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(44, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(84, 105, i, decodeRgbValue(255, 255, 255));
+			}
+
+
+
+		lcdLine(64, 65, 64, 82, decodeRgbValue(255, 255, 255));
+		lcdLine(42, 85, 85, 85, decodeRgbValue(255, 255, 255));
+		lcdLine(50, 70, 79, 99, decodeRgbValue(255, 255, 255));
+		lcdLine(49, 100, 80, 70, decodeRgbValue(255, 255, 255));
+}
+
+
+void DrawCloudy(void){
+
+	for(int i=10; i>0;i--){
+					lcdCircle(54, 100, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(74, 100, i, decodeRgbValue(255, 255, 255));
+	}
+
+	for(int i=8; i>0;i--){
+
+				lcdCircle(64, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(44, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(84, 105, i, decodeRgbValue(255, 255, 255));
+			}
+}
+
+void DrawWorsening(void){
+
+	for(int i=10; i>0;i--){
+					lcdCircle(54, 100, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(74, 100, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(94, 100, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(34, 100, i, decodeRgbValue(255, 255, 255));
+	}
+
+	for(int i=8; i>0;i--){
+
+				lcdCircle(64, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(44, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(84, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(104, 105, i, decodeRgbValue(255, 255, 255));
+				lcdCircle(24, 105, i, decodeRgbValue(255, 255, 255));
+			}
+}
+
+void DrawRaining(void){
+
+	for(int i=10; i>0;i--){ // big circles
+						lcdCircle(54, 100, i, decodeRgbValue(255, 255, 255));
+						lcdCircle(74, 100, i, decodeRgbValue(255, 255, 255));
+						lcdCircle(94, 100, i, decodeRgbValue(255, 255, 255));
+						lcdCircle(34, 100, i, decodeRgbValue(255, 255, 255));
+		}
+
+		for(int i=8; i>0;i--){ // small circles
+
+					lcdCircle(64, 105, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(44, 105, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(84, 105, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(104, 105, i, decodeRgbValue(255, 255, 255));
+					lcdCircle(24, 105, i, decodeRgbValue(255, 255, 255));
+				}
+
+		// rain
+		lcdLine(24, 118, 24, 124, decodeRgbValue(0, 0, 255));
+		lcdLine(34, 114, 34, 122, decodeRgbValue(0, 0, 255));
+		lcdLine(44, 118, 44, 124, decodeRgbValue(0, 0, 255));
+		lcdLine(54, 114, 54, 122, decodeRgbValue(0, 0, 255));
+		lcdLine(64, 118, 64, 124, decodeRgbValue(0, 0, 255));
+		lcdLine(74, 114, 74, 122, decodeRgbValue(0, 0, 255));
+		lcdLine(84, 118, 84, 124, decodeRgbValue(0, 0, 255));
+		lcdLine(94, 114, 94, 122, decodeRgbValue(0, 0, 255));
+		lcdLine(104, 118, 104, 124, decodeRgbValue(0, 0, 255));
+
+
+
+	}
+
+void DrawSnow(void){
+
+	lcdCircle(64, 85, 12, decodeRgbValue(0, 0, 255));
+	lcdCircle(64, 85, 7, decodeRgbValue(0, 0, 255));
+	lcdCircle(64, 85, 2, decodeRgbValue(0, 0, 255));
+
+	lcdLine(64, 65, 64, 105, decodeRgbValue(0, 0, 255));
+	lcdLine(42, 85, 85, 85, decodeRgbValue(0, 0, 255));
+	lcdLine(50, 70, 79, 99, decodeRgbValue(0, 0, 255));
+	lcdLine(49, 100, 80, 70, decodeRgbValue(0, 0, 255));
+}
+
+
+
 /* USER CODE END 4 */
 
 /**

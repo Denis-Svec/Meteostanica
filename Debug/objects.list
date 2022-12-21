@@ -13,6 +13,7 @@
 "./Src/lps22hb.o"
 "./Src/lsm6ds0.o"
 "./Src/main.o"
+"./Src/predictw.o"
 "./Src/spi.o"
 "./Src/stm32f3xx_it.o"
 "./Src/syscalls.o"
